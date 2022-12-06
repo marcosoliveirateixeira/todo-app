@@ -6,39 +6,81 @@ pipeline:
   tags: {}
   stages:
     - stage:
-        name: Build
-        identifier: Build
-        description: ""
-        type: Custom
+        name: Test and Build
+        identifier: Test_and_Build
+        type: CI
         spec:
+          cloneCodebase: true
           execution:
             steps:
               - step:
-                  type: ShellScript
-                  name: Install Dependencies
-                  identifier: Install_Dependencies
+                  type: Run
+                  name: Test
+                  identifier: Test
                   spec:
-                    shell: Bash
-                    onDelegate: true
-                    source:
-                      type: Inline
-                      spec:
-                        script: npm install
-                    environmentVariables: []
-                    outputVariables: []
-                  timeout: 10m
+                    connectorRef: marcosoliveirateixeira
+                    image: node:16
+                    shell: Sh
+                    command: |-
+                      npm install
+                      npm test
               - step:
-                  type: ShellScript
-                  name: Docker Build
-                  identifier: Docker_Build
+                  type: BuildAndPushDockerRegistry
+                  name: Push
+                  identifier: Push
                   spec:
-                    shell: Bash
-                    onDelegate: true
-                    source:
-                      type: Inline
-                      spec:
-                        script: docker build -t todo-list-app .
-                    environmentVariables: []
-                    outputVariables: []
+                    connectorRef: marcosoliveirateixeira
+                    repo: marcosoliveirateixeira/jorgin
+                    tags:
+                      - latest
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+    - stage:
+        name: Deploy dessa porra
+        identifier: Deploy_dessa_porra
+        description: ""
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: todoService
+          environment:
+            environmentRef: todoEnv
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: todoInfra
+          execution:
+            steps:
+              - step:
+                  name: Rollout Deployment
+                  identifier: rolloutDeployment
+                  type: K8sRollingDeploy
                   timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rollback Rollout Deployment
+                  identifier: rollbackRolloutDeployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false
         tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+  properties:
+    ci:
+      codebase:
+        connectorRef: Marcos
+        repoName: todo-app
+        build: <+input>
