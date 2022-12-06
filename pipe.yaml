@@ -30,7 +30,7 @@ pipeline:
                   identifier: Push
                   spec:
                     connectorRef: marcosoliveirateixeira
-                    repo: marcosoliveirateixeira/jorgin
+                    repo: jorgin
                     tags:
                       - latest
           platform:
