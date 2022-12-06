@@ -1,0 +1,44 @@
+pipeline:
+  name: todo-app
+  identifier: todoapp
+  projectIdentifier: Marcos
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: Build
+        identifier: Build
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: Install Dependencies
+                  identifier: Install_Dependencies
+                  spec:
+                    shell: Bash
+                    onDelegate: true
+                    source:
+                      type: Inline
+                      spec:
+                        script: npm install
+                    environmentVariables: []
+                    outputVariables: []
+                  timeout: 10m
+              - step:
+                  type: ShellScript
+                  name: Docker Build
+                  identifier: Docker_Build
+                  spec:
+                    shell: Bash
+                    onDelegate: true
+                    source:
+                      type: Inline
+                      spec:
+                        script: docker build -t todo-list-app .
+                    environmentVariables: []
+                    outputVariables: []
+                  timeout: 10m
+        tags: {}
