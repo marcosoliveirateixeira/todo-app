@@ -15,7 +15,7 @@ spec:
         app: todo-app
     spec:
       containers:
-      - image: marcosoliveirateixeira/todo-app
+      - image: marcosoliveirateixeira/jorgin
         name: todo-app
         ports:
         - containerPort: 8080
