@@ -30,9 +30,10 @@ pipeline:
                   identifier: Push
                   spec:
                     connectorRef: marcosoliveirateixeira
-                    repo: jorgin
+                    repo: marcosoliveirateixeira/jorgin
                     tags:
                       - latest
+                  failureStrategies: []
           platform:
             os: Linux
             arch: Amd64
